@@ -207,14 +207,14 @@ class Simulator:
         return sum(sorted(result)[::-1][:n_top_samples]) / n_top_samples
 
 
-def init_multicore():
+def init_multicore(simulator):
     global pool
-    pool = Pool(cpu_count())
+    pool = Pool(cpu_count(), initializer=simulator.load_prices)
 
 
 def scan_param(filename, **kw):
     simulator = Simulator(filename, EXT_FEE, add_reverse=kw.pop('add_reverse', True))
-    init_multicore()
+    init_multicore(simulator)
     args = {'samples': 500000, 'n_top_samples': 50, 'min_loan_duration': 0.15, 'max_loan_duration': 0.15}
     args.update(kw)
     iterable_args = [k for k in kw if isinstance(kw[k], Iterable)]
